@@ -11,8 +11,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        StreamProvider<FirebaseUser>.value(
-            stream: FirebaseAuth.instance.onAuthStateChanged)
+        StreamProvider<User?>.value(
+            value: FirebaseAuth.instance.authStateChanges(), initialData: null,)
       ],
       child: MaterialApp(
         // theme: ThemeData(brightness: Brightness.dark),
@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
             padding: EdgeInsets.all(20),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                  colors: [Colors.deepOrange, Colors.orange[600]],
+                  colors: [Colors.deepOrange, Colors.orange],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight),
             ),
@@ -41,7 +41,7 @@ class HeroScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var user = Provider.of<FirebaseUser>(context);
+    var user = Provider.of<User?>(context);
     bool loggedIn = user != null;
 
     return Column(
@@ -54,7 +54,8 @@ class HeroScreen extends StatelessWidget {
           ),
 
           StreamProvider<List<Weapon>>.value(
-            stream: db.streamWeapons(user),
+            value: db.streamWeapons(user),
+            initialData: [],
             child: WeaponsList(),
           ),
 
@@ -68,21 +69,21 @@ class HeroScreen extends StatelessWidget {
                   children: <Widget>[
                     Text('Equip ${hero.name}',
                         textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.headline),
+                        style: Theme.of(context).textTheme.displayMedium),
                     ButtonBar(
                       alignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        RaisedButton(
+                        ElevatedButton(
                           child: Text('Add Knife'),
                           onPressed: () => db.addWeapon(user,
                               {'name': 'knife', 'hitpoints': 20, 'img': '🗡️'}),
                         ),
-                        RaisedButton(
+                        ElevatedButton(
                           child: Text('Add Gun'),
                           onPressed: () => db.addWeapon(user,
                               {'name': 'gun', 'hitpoints': 75, 'img': '🔫'}),
                         ),
-                        RaisedButton(
+                        ElevatedButton(
                           child: Text('Add Veggie'),
                           onPressed: () => db.addWeapon(user, {
                                 'name': 'cucumber',
@@ -95,7 +96,7 @@ class HeroScreen extends StatelessWidget {
                   ],
                 );
               } else {
-                return RaisedButton(
+                return ElevatedButton(
                     child: Text('Create'),
                     onPressed: () => db.createHero(user));
               }
@@ -105,7 +106,7 @@ class HeroScreen extends StatelessWidget {
           // RaisedButton(child: Text('Sign out'), onPressed: auth.signOut),
         ],
         if (!loggedIn) ...[
-          RaisedButton(
+          ElevatedButton(
             child: Text('Login'),
             onPressed: FirebaseAuth.instance.signInAnonymously,
           )
@@ -119,7 +120,7 @@ class WeaponsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var weapons = Provider.of<List<Weapon>>(context);
-    var user = Provider.of<FirebaseUser>(context);
+    var user = Provider.of<User>(context);
 
     return Container(
       height: 300,

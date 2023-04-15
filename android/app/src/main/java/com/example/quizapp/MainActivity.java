@@ -1,13 +1,6 @@
 package com.example.quizapp;
 
-import android.os.Bundle;
-import io.flutter.app.FlutterActivity;
-import io.flutter.plugins.GeneratedPluginRegistrant;
-
+import io.flutter.embedding.android.FlutterActivity;
+//https://github.com/flutter/flutter/wiki/Upgrading-pre-1.12-Android-projects
 public class MainActivity extends FlutterActivity {
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    GeneratedPluginRegistrant.registerWith(this);
-  }
 }

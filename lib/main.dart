@@ -1,32 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'firebase_options.dart';
 import 'db.dart';
 import 'models.dart';
 
-void main() => runApp(MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(const MyApp());
+}
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
         StreamProvider<User?>.value(
-            value: FirebaseAuth.instance.authStateChanges(), initialData: null,)
+          value: FirebaseAuth.instance.authStateChanges(),
+          initialData: null,
+        )
       ],
       child: MaterialApp(
         // theme: ThemeData(brightness: Brightness.dark),
         home: Scaffold(
           body: Container(
-            padding: EdgeInsets.all(20),
-            decoration: BoxDecoration(
+            padding: const EdgeInsets.all(20),
+            decoration: const BoxDecoration(
               gradient: LinearGradient(
                   colors: [Colors.deepOrange, Colors.orange],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight),
             ),
             child: Center(
-              child: new HeroScreen(),
+              child: HeroScreen(),
             ),
           ),
         ),
@@ -36,6 +48,8 @@ class MyApp extends StatelessWidget {
 }
 
 class HeroScreen extends StatelessWidget {
+  HeroScreen({super.key});
+  
   final auth = FirebaseAuth.instance;
   final db = DatabaseService();
 
@@ -49,14 +63,14 @@ class HeroScreen extends StatelessWidget {
       children: <Widget>[
         if (loggedIn) ...[
           SizedBox(
-            child: Image.asset('assets/dog.png'),
             width: 150,
+            child: Image.asset('assets/dog.png'),
           ),
 
           StreamProvider<List<Weapon>>.value(
             value: db.streamWeapons(user),
-            initialData: [],
-            child: WeaponsList(),
+            initialData: const [],
+            child: const WeaponsList(),
           ),
 
           StreamBuilder<SuperHero>(
@@ -74,22 +88,22 @@ class HeroScreen extends StatelessWidget {
                       alignment: MainAxisAlignment.center,
                       children: <Widget>[
                         ElevatedButton(
-                          child: Text('Add Knife'),
+                          child: const Text('Add Knife'),
                           onPressed: () => db.addWeapon(user,
                               {'name': 'knife', 'hitpoints': 20, 'img': '🗡️'}),
                         ),
                         ElevatedButton(
-                          child: Text('Add Gun'),
+                          child: const Text('Add Gun'),
                           onPressed: () => db.addWeapon(user,
                               {'name': 'gun', 'hitpoints': 75, 'img': '🔫'}),
                         ),
                         ElevatedButton(
-                          child: Text('Add Veggie'),
+                          child: const Text('Add Veggie'),
                           onPressed: () => db.addWeapon(user, {
-                                'name': 'cucumber',
-                                'hitpoints': 5,
-                                'img': '🥒'
-                              }),
+                            'name': 'cucumber',
+                            'hitpoints': 5,
+                            'img': '🥒'
+                          }),
                         )
                       ],
                     ),
@@ -97,7 +111,7 @@ class HeroScreen extends StatelessWidget {
                 );
               } else {
                 return ElevatedButton(
-                    child: Text('Create'),
+                    child: const Text('Create'),
                     onPressed: () => db.createHero(user));
               }
             },
@@ -107,8 +121,8 @@ class HeroScreen extends StatelessWidget {
         ],
         if (!loggedIn) ...[
           ElevatedButton(
-            child: Text('Login'),
             onPressed: FirebaseAuth.instance.signInAnonymously,
+            child: const Text('Login'),
           )
         ]
       ],
@@ -117,18 +131,20 @@ class HeroScreen extends StatelessWidget {
 }
 
 class WeaponsList extends StatelessWidget {
+  const WeaponsList({super.key});
+
   @override
   Widget build(BuildContext context) {
     var weapons = Provider.of<List<Weapon>>(context);
     var user = Provider.of<User>(context);
 
-    return Container(
+    return SizedBox(
       height: 300,
       child: ListView(
         children: weapons.map((weapon) {
           return Card(
             child: ListTile(
-              leading: Text(weapon.img, style: TextStyle(fontSize: 50)),
+              leading: Text(weapon.img, style: const TextStyle(fontSize: 50)),
               title: Text(weapon.name),
               subtitle: Text('Deals ${weapon.hitpoints} hitpoints of damage'),
               onTap: () => DatabaseService().removeWeapon(user, weapon.id),

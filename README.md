@@ -1,6 +1,6 @@
 # Episode 185 - Advanced Flutter Firestore
 
 
-flutterfire configure
-flutter create .
-flutter run
+1. flutterfire configure
+2. flutter create .
+3. flutter run

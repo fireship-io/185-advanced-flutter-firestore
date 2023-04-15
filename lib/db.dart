@@ -4,52 +4,52 @@ import 'dart:async';
 import 'models.dart';
 
 class DatabaseService {
-  final Firestore _db = Firestore.instance;
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   Future<SuperHero> getHero(String id) async {
-    var snap = await _db.collection('heroes').document(id).get();
+    var snap = await _db.collection('heroes').doc(id).get();
 
-    return SuperHero.fromMap(snap.data);
+    return SuperHero.fromMap(snap.data() as Map);
   }
 
   /// Get a stream of a single document
   Stream<SuperHero> streamHero(String id) {
     return _db
         .collection('heroes')
-        .document(id)
+        .doc(id)
         .snapshots()
-        .map((snap) => SuperHero.fromMap(snap.data));
+        .map((snap) => SuperHero.fromMap(snap.data() as Map));
   }
 
   /// Query a subcollection
-  Stream<List<Weapon>> streamWeapons(FirebaseUser user) {
-    var ref = _db.collection('heroes').document(user.uid).collection('weapons');
+  Stream<List<Weapon>> streamWeapons(User user) {
+    var ref = _db.collection('heroes').doc(user.uid).collection('weapons');
 
     return ref.snapshots().map((list) =>
-        list.documents.map((doc) => Weapon.fromFirestore(doc)).toList());
+        list.docs.map((doc) => Weapon.fromFirestore(doc)).toList());
   }
 
-  Future<void> createHero(FirebaseUser user) {
+  Future<void> createHero(User user) {
     return _db
         .collection('heroes')
-        .document(user.uid)
-        .setData({'name': 'DogMan ${user.uid.substring(0,5)}'});
+        .doc(user.uid)
+        .set({'name': 'DogMan ${user.uid.substring(0,5)}'});
   }
 
-  Future<void> addWeapon(FirebaseUser user, dynamic weapon) {
+  Future<void> addWeapon(User user, dynamic weapon) {
     return _db
         .collection('heroes')
-        .document(user.uid)
+        .doc(user.uid)
         .collection('weapons')
         .add(weapon);
   }
 
-  Future<void> removeWeapon(FirebaseUser user, String id) {
+  Future<void> removeWeapon(User user, String id) {
     return _db
         .collection('heroes')
-        .document(user.uid)
+        .doc(user.uid)
         .collection('weapons')
-        .document(id)
+        .doc(id)
         .delete();
   }
 }

@@ -26,7 +26,7 @@ class Weapon {
   Weapon({ required this.id, required this.name, required this.hitpoints, required this.img, });
 
   factory Weapon.fromFirestore(DocumentSnapshot doc) {
-    Map data = doc.data as Map;
+    Map data = doc.data() as Map;
     
     return Weapon(
       id: doc.id,

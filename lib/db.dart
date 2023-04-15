@@ -9,7 +9,7 @@ class DatabaseService {
   Future<SuperHero> getHero(String id) async {
     var snap = await _db.collection('heroes').doc(id).get();
 
-    return SuperHero.fromMap(snap.data as Map);
+    return SuperHero.fromMap(snap.data() as Map);
   }
 
   /// Get a stream of a single document
@@ -18,7 +18,7 @@ class DatabaseService {
         .collection('heroes')
         .doc(id)
         .snapshots()
-        .map((snap) => SuperHero.fromMap(snap.data as Map));
+        .map((snap) => SuperHero.fromMap(snap.data() as Map));
   }
 
   /// Query a subcollection
